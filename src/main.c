@@ -1,7 +1,12 @@
-#include "stdio.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int main() {
-  printf("Hello");
+#include "data.h"
+
+const int MAX_LINE_LEN = 5000;
+
+int main(void) {
+  readData("resources/mnist_train.csv", 60000);
   return 0;
 }
