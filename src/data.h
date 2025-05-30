@@ -1,3 +1,7 @@
+#ifndef DATA_H_HEADER_GUARD
+#define DATA_H_HEADER_GUARD
+
+#include "image.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,12 +11,13 @@
 #define IMAGE_HEIGHT 28
 const int MAX_LINE_SIZE = 5000;
 
-typedef struct NumberImage {
+typedef struct LabeledImage {
   uint8_t label;
-  uint8_t pixels[IMAGE_HEIGHT][IMAGE_WIDTH];
-} NumberImage;
 
-NumberImage *readData(char *dataPath, int rows) {
+  Image *image;
+} LabeledImage;
+
+LabeledImage *readData(char *dataPath, int rows) {
   FILE *file = fopen(dataPath, "r");
 
   if (!file) {
@@ -20,7 +25,10 @@ NumberImage *readData(char *dataPath, int rows) {
     exit(EXIT_FAILURE);
   }
 
-  NumberImage *images = malloc(sizeof(NumberImage) * rows);
+  LabeledImage *images = malloc(sizeof(LabeledImage) * rows);
+  for (int i = 0; i < rows; i++) {
+    images[i].image = newEmptyImage(28, 28, 1);
+  }
 
   int lineNumber = 0;
   char line[MAX_LINE_SIZE];
@@ -40,7 +48,7 @@ NumberImage *readData(char *dataPath, int rows) {
 
     while (token != NULL) {
       int pixel = atoi(token);
-      images[lineNumber].pixels[row][col] = pixel;
+      images[lineNumber].image->channels[0]->pixels[row][col] = pixel;
       col++;
       if (col == IMAGE_WIDTH) {
         col = 0;
@@ -58,5 +66,11 @@ NumberImage *readData(char *dataPath, int rows) {
     lineNumber++;
   }
 
+  if (lineNumber != rows) {
+    printf("Rows does not match row count. Actual %d", lineNumber);
+  }
+
   return images;
 }
+
+#endif
